@@ -7,38 +7,558 @@
   <meta name="description" content="Divida a conta do restaurante com uma distribuição exata dos centavos.">
   <title>Divisor de Conta</title>
   <style>
-    :root{color-scheme:light;--paper:#f6f1e9;--surface:#fffdf9;--ink:#302923;--muted:#75695e;--line:#e4d9cb;--olive:#6d7559;--olive-dark:#515b40;--plum:#7a405d;--plum-soft:#f3e8ed;--danger:#9b3e38;--danger-soft:#f9e9e6;--shadow:0 22px 70px rgba(48,41,35,.09);--serif:Georgia,'Times New Roman',serif;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
-    *{box-sizing:border-box}html{min-width:320px;background:var(--paper)}body{margin:0;min-height:100vh;padding:28px 18px 42px;color:var(--ink);background:radial-gradient(circle at 10% 0%,rgba(122,64,93,.07),transparent 30rem),radial-gradient(circle at 100% 75%,rgba(109,117,89,.08),transparent 28rem),var(--paper);font-family:var(--sans);line-height:1.5}button,input{font:inherit}button:focus-visible,input:focus-visible{outline:3px solid rgba(122,64,93,.35);outline-offset:3px}.page{width:min(100%,980px);margin:0 auto}.topline{display:flex;align-items:center;gap:11px;margin:0 0 22px;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}.topline:before{content:'';width:27px;height:1px;background:var(--plum)}header{max-width:680px;margin-bottom:30px}h1{margin:0;font:500 clamp(2.5rem,7vw,4.5rem)/.98 var(--serif);letter-spacing:-.045em}.intro{max-width:540px;margin:17px 0 0;color:var(--muted);font-size:16px}.layout{display:grid;grid-template-columns:minmax(0,1.03fr) minmax(290px,.97fr);gap:18px;align-items:stretch}.panel{border:1px solid rgba(125,105,86,.17);border-radius:22px;background:var(--surface);box-shadow:var(--shadow)}.form-panel{padding:clamp(22px,4vw,34px)}.section-kicker{margin:0 0 24px;color:var(--olive-dark);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}.field{margin-bottom:22px}label{display:block;margin-bottom:8px;font-size:14px;font-weight:650}.field-note{display:block;margin-top:7px;color:var(--muted);font-size:12px}input{display:block;width:100%;min-height:54px;padding:13px 15px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-size:18px}input::placeholder{color:#b4a99e}input:focus{border-color:var(--olive);box-shadow:0 0 0 3px rgba(109,117,89,.10);outline:none}.tax-row{display:flex;align-items:center;gap:10px}.tax-row input{min-width:0;flex:1}.tax-button{flex:0 0 auto;min-width:70px;min-height:48px;padding:0 17px;border:1px solid #d9c7d0;border-radius:11px;background:var(--plum-soft);color:var(--plum);font-weight:750;cursor:pointer}.tax-button:hover{background:#ead8e1}.result-panel{display:flex;min-height:100%;flex-direction:column;justify-content:space-between;padding:clamp(22px,4vw,34px);background:#eaece3;border-color:#d9ddce}.result-panel .section-kicker{color:var(--olive-dark)}.result-label,.share-title{margin:0 0 7px;color:#5f6850;font-size:13px;font-weight:650}.total{margin:0;font:500 clamp(2.2rem,5vw,3.3rem)/1.05 var(--serif);letter-spacing:-.04em;overflow-wrap:anywhere}.result-divider{height:1px;margin:27px 0 23px;background:#d1d7c7}.share-amount{margin:0;font:500 clamp(1.65rem,4vw,2.3rem)/1.15 var(--serif);letter-spacing:-.025em;overflow-wrap:anywhere}.share-detail{margin:10px 0 0;color:#505a45;font-size:14px;line-height:1.6}.empty-state{display:grid;min-height:170px;align-content:center;gap:9px;color:#68715a}.empty-mark{display:grid;width:42px;height:42px;place-items:center;border:1px solid #cbd2c0;border-radius:50%;color:var(--olive-dark);font:500 22px var(--serif)}.empty-state p{max-width:270px;margin:0;font-size:14px}.error-state{padding:15px 16px;border:1px solid #e8c6c0;border-radius:12px;background:var(--danger-soft);color:var(--danger);font-size:14px;font-weight:600}[hidden]{display:none!important}.privacy-note{display:flex;align-items:center;gap:9px;margin:24px 2px 0;color:var(--muted);font-size:12px}.privacy-note svg{flex:0 0 auto}footer{display:flex;justify-content:space-between;gap:14px;margin-top:23px;color:#897d72;font-size:11px}@media(max-width:720px){body{padding:22px 14px 32px}.layout{grid-template-columns:1fr}header{margin-bottom:23px}.result-panel{min-height:300px}footer{flex-direction:column;gap:4px}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+    /* ===== Cores, fontes e sombras usadas em toda a página ===== */
+    :root {
+      color-scheme: light;
+      --paper: #f6f1e9;
+      --surface: #fffdf9;
+      --ink: #302923;
+      --muted: #75695e;
+      --line: #9c8e80;          /* borda dos campos (contraste mínimo 3:1) */
+      --olive: #6d7559;
+      --olive-dark: #515b40;
+      --plum: #7a405d;
+      --plum-soft: #f3e8ed;
+      --danger: #9b3e38;
+      --danger-soft: #f9e9e6;
+      --shadow: 0 22px 70px rgba(48, 41, 35, .09);
+      --serif: Georgia, 'Times New Roman', serif;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* ===== Base ===== */
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--paper); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 28px 18px 42px;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(122, 64, 93, .07), transparent 30rem),
+        radial-gradient(circle at 100% 75%, rgba(109, 117, 89, .08), transparent 28rem),
+        var(--paper);
+      font-family: var(--sans);
+      line-height: 1.5;
+    }
+    button, input { font: inherit; }
+    button:focus-visible, input:focus-visible {
+      outline: 3px solid rgba(122, 64, 93, .35);
+      outline-offset: 3px;
+    }
+    [hidden] { display: none !important; }
+
+    /* Texto só para leitores de tela (invisível na tela) */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ===== Cabeçalho ===== */
+    .page { width: min(100%, 980px); margin: 0 auto; }
+    .topline {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .topline:before { content: ''; width: 27px; height: 1px; background: var(--plum); }
+    header { max-width: 680px; margin-bottom: 30px; }
+    h1 { margin: 0; font: 500 clamp(2.5rem, 7vw, 4.5rem)/.98 var(--serif); letter-spacing: -.045em; }
+    .intro { max-width: 540px; margin: 17px 0 0; color: var(--muted); font-size: 16px; }
+
+    /* ===== Duas colunas: formulário e resultado ===== */
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.03fr) minmax(290px, .97fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+    .panel {
+      border: 1px solid rgba(125, 105, 86, .17);
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    /* ===== Formulário ===== */
+    .form-panel { padding: clamp(22px, 4vw, 34px); }
+    .section-kicker {
+      margin: 0 0 24px;
+      color: var(--olive-dark);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .field { margin-bottom: 22px; }
+    .field:last-of-type { margin-bottom: 0; }
+    label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 650; }
+    .field-note { display: block; margin-top: 7px; color: var(--muted); font-size: 12px; }
+    input {
+      display: block;
+      width: 100%;
+      min-height: 54px;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 18px;   /* 16px ou mais evita o zoom automático do iPhone */
+    }
+    input::placeholder { color: #7a6f65; }
+    input:focus { border-color: var(--olive); box-shadow: 0 0 0 3px rgba(109, 117, 89, .10); outline: none; }
+    input[aria-invalid="true"] { border-color: var(--danger); }
+
+    /* Mensagem de erro logo abaixo do campo */
+    .field-error {
+      margin: 8px 0 0;
+      padding: 9px 12px;
+      border: 1px solid #e8c6c0;
+      border-radius: 10px;
+      background: var(--danger-soft);
+      color: var(--danger);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .tax-row { display: flex; align-items: center; gap: 10px; }
+    .tax-row input { min-width: 0; flex: 1; }
+    .tax-button {
+      flex: 0 0 auto;
+      min-width: 70px;
+      min-height: 48px;
+      padding: 0 17px;
+      border: 1px solid #d9c7d0;
+      border-radius: 11px;
+      background: var(--plum-soft);
+      color: var(--plum);
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .tax-button:hover { background: #ead8e1; }
+
+    /* Botão "Ver a divisão": só aparece no celular, leva até o resultado */
+    .show-result {
+      display: none;
+      width: 100%;
+      min-height: 52px;
+      margin-top: 26px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--plum);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ===== Resultado ===== */
+    .result-panel {
+      display: flex;
+      min-height: 100%;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(22px, 4vw, 34px);
+      background: #eaece3;
+      border-color: #d9ddce;
+    }
+    .result-panel:focus { outline: none; }
+    .result-panel .section-kicker { color: var(--olive-dark); }
+    .result-label, .share-title { margin: 0 0 7px; color: #5f6850; font-size: 13px; font-weight: 650; }
+    .total {
+      margin: 0;
+      font: 500 clamp(2.2rem, 5vw, 3.3rem)/1.05 var(--serif);
+      letter-spacing: -.04em;
+      overflow-wrap: anywhere;
+    }
+    .result-divider { height: 1px; margin: 27px 0 23px; background: #d1d7c7; }
+    .share-amount {
+      margin: 0;
+      font: 500 clamp(1.65rem, 4vw, 2.3rem)/1.15 var(--serif);
+      letter-spacing: -.025em;
+      overflow-wrap: anywhere;
+    }
+    .share-detail { margin: 10px 0 0; color: #505a45; font-size: 14px; line-height: 1.6; }
+    .empty-state { display: grid; min-height: 170px; align-content: center; gap: 9px; color: #5a634c; }
+    .empty-mark {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 1px solid #cbd2c0;
+      border-radius: 50%;
+      color: var(--olive-dark);
+      font: 500 22px var(--serif);
+    }
+    .empty-state p { max-width: 270px; margin: 0; font-size: 14px; }
+
+    /* ===== Rodapé ===== */
+    .privacy-note { display: flex; align-items: center; gap: 9px; margin: 24px 2px 0; color: var(--muted); font-size: 12px; }
+    .privacy-note svg { flex: 0 0 auto; }
+    footer { display: flex; justify-content: space-between; gap: 14px; margin-top: 23px; color: #6e6359; font-size: 11px; }
+
+    /* ===== Celular (até 720 px): uma coluna só ===== */
+    @media (max-width: 720px) {
+      body { padding: 22px 14px 32px; }
+      .layout { grid-template-columns: 1fr; }
+      header { margin-bottom: 23px; }
+      .result-panel { min-height: 300px; scroll-margin-top: 12px; }
+      .show-result { display: block; }
+      footer { flex-direction: column; gap: 4px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *:before, *:after { scroll-behavior: auto !important; transition: none !important; }
+    }
   </style>
 </head>
 <body>
   <main class="page">
     <div class="topline">Um exemplo do Guia para o Primeiro App</div>
-    <header><h1>Divisor de Conta</h1><p class="intro">Descubra quanto cada pessoa paga — com a taxa de serviço opcional e os centavos distribuídos sem diferença no total.</p></header>
+    <header>
+      <h1>Divisor de Conta</h1>
+      <p class="intro">Descubra quanto cada pessoa paga — com a taxa de serviço opcional e os centavos distribuídos sem diferença no total.</p>
+    </header>
+
     <div class="layout">
+      <!-- ===== Formulário ===== -->
       <section class="panel form-panel" aria-labelledby="form-title">
         <h2 class="section-kicker" id="form-title">Preencha os valores</h2>
-        <div class="field"><label for="amount">Valor da conta</label><input id="amount" name="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="Ex.: 1.234,56" aria-describedby="amount-note"><span class="field-note" id="amount-note">Em reais. Use ponto para milhar e vírgula para centavos.</span></div>
-        <div class="field"><label for="people">Número de pessoas</label><input id="people" name="people" type="text" inputmode="numeric" autocomplete="off" placeholder="Ex.: 4" aria-describedby="people-note"><span class="field-note" id="people-note">Digite um número inteiro de 1 a 99.</span></div>
-        <div class="field" style="margin-bottom:0"><label for="tax">Taxa de serviço (%)</label><div class="tax-row"><input id="tax" name="tax" type="text" inputmode="decimal" autocomplete="off" value="0" aria-describedby="tax-note"><button class="tax-button" id="apply-tax" type="button" aria-label="Aplicar taxa de serviço de 10 por cento">10%</button></div><span class="field-note" id="tax-note">A taxa começa em 0%. Toque em 10% se quiser aplicá-la.</span></div>
+        <form id="split-form" novalidate>
+          <div class="field">
+            <label for="amount">Valor da conta</label>
+            <input id="amount" name="amount" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" placeholder="Ex.: 1.234,56" aria-describedby="amount-note">
+            <span class="field-note" id="amount-note">Em reais. Pode digitar 1234,56 ou 1.234,56 ou 1234.56.</span>
+            <p class="field-error" id="amount-error" hidden></p>
+          </div>
+          <div class="field">
+            <label for="people">Número de pessoas</label>
+            <input id="people" name="people" type="text" inputmode="numeric" enterkeyhint="next" autocomplete="off" placeholder="Ex.: 4" aria-describedby="people-note">
+            <span class="field-note" id="people-note">Digite um número inteiro de 1 a 99.</span>
+            <p class="field-error" id="people-error" hidden></p>
+          </div>
+          <div class="field">
+            <label for="tax">Taxa de serviço (%)</label>
+            <div class="tax-row">
+              <input id="tax" name="tax" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" value="0" aria-describedby="tax-note">
+              <button class="tax-button" id="apply-tax" type="button" aria-label="Aplicar taxa de serviço de 10 por cento">10%</button>
+            </div>
+            <span class="field-note" id="tax-note">A taxa começa em 0%. Toque em 10% se quiser aplicá-la.</span>
+            <p class="field-error" id="tax-error" hidden></p>
+          </div>
+          <button class="show-result" type="submit">Ver a divisão</button>
+        </form>
       </section>
-      <section class="panel result-panel" aria-labelledby="result-title" aria-live="polite"><div><h2 class="section-kicker" id="result-title">Resultado da divisão</h2><div id="empty-state" class="empty-state"><span class="empty-mark" aria-hidden="true">÷</span><p>Preencha o valor da conta e o número de pessoas para ver a divisão.</p></div><div id="error-state" class="error-state" role="alert" hidden></div><div id="calculation" hidden><p class="result-label">Total da conta com taxa</p><p class="total" id="total-value"></p><div class="result-divider"></div><p class="share-title">Divisão por pessoa</p><p class="share-amount" id="share-value"></p><p class="share-detail" id="share-detail"></p></div></div></section>
+
+      <!-- ===== Resultado ===== -->
+      <section class="panel result-panel" id="result-panel" aria-labelledby="result-title" tabindex="-1">
+        <div>
+          <h2 class="section-kicker" id="result-title">Resultado da divisão</h2>
+          <div id="empty-state" class="empty-state">
+            <span class="empty-mark" aria-hidden="true">÷</span>
+            <p id="empty-text">Preencha o valor da conta e o número de pessoas para ver a divisão.</p>
+          </div>
+          <div id="calculation" hidden>
+            <p class="result-label">Total da conta com taxa</p>
+            <p class="total" id="total-value"></p>
+            <div class="result-divider"></div>
+            <p class="share-title">Divisão por pessoa</p>
+            <p class="share-amount" id="share-value"></p>
+            <p class="share-detail" id="share-detail"></p>
+          </div>
+        </div>
+      </section>
     </div>
-    <p class="privacy-note"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.2 6.7V4.9a3.8 3.8 0 0 1 7.6 0v1.8M3.2 6.7h9.6v7H3.2v-7Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 9.2v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>O cálculo acontece nesta página. Nenhuma informação é salva.</p>
-    <footer><span>Guia para o Primeiro App · Projeto demonstrativo</span><span>Uma primeira versão para aprender, testar e melhorar.</span></footer>
+
+    <!-- Aviso para leitores de tela: lido uma vez, depois que a pessoa para de digitar -->
+    <p class="sr-only" id="announcer" role="status" aria-live="polite"></p>
+
+    <p class="privacy-note">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.2 6.7V4.9a3.8 3.8 0 0 1 7.6 0v1.8M3.2 6.7h9.6v7H3.2v-7Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 9.2v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      O cálculo acontece nesta página. Nenhuma informação é salva.
+    </p>
+    <footer>
+      <span>Guia para o Primeiro App · Projeto demonstrativo</span>
+      <span>Uma primeira versão para aprender, testar e melhorar.</span>
+    </footer>
   </main>
+
   <script>
-  (function(){'use strict';
-    const moneyPattern=/^(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{1,2})?$/;
-    function parseMoneyToCents(raw){const value=String(raw??'').trim();if(!value)return{ok:false,error:'Informe o valor da conta.'};if(value.startsWith('-'))return{ok:false,error:'O valor da conta não pode ser negativo.'};if(!moneyPattern.test(value))return{ok:false,error:'Valor inválido. Digite apenas números no padrão brasileiro (ex.: 1.234,56).'};const parts=value.replace(/\./g,'').split(',');const whole=BigInt(parts[0]);const decimal=BigInt((parts[1]||'').padEnd(2,'0')||'0');return{ok:true,cents:whole*100n+decimal};}
-    function parsePeople(raw){const value=String(raw??'').trim();if(!value)return{ok:false,error:'Informe o número de pessoas.'};if(/[,\.]/.test(value))return{ok:false,error:'O número de pessoas deve ser um número inteiro, sem decimais.'};if(!/^\d+$/.test(value))return{ok:false,error:'O número de pessoas deve ser um número inteiro de 1 a 99.'};const count=Number(value);if(count===0)return{ok:false,error:'O número de pessoas não pode ser 0. Informe de 1 a 99.'};if(count>99)return{ok:false,error:'O número de pessoas deve ser um número inteiro de 1 a 99.'};return{ok:true,count};}
-    function parsePercent(raw){const value=String(raw??'').trim();if(!value)return{ok:true,units:0n,scale:1n};if(value.startsWith('-'))return{ok:false,error:'A taxa de serviço não pode ser negativa.'};if(!/^\d+(?:[,.]\d{1,2})?$/.test(value))return{ok:false,error:'Taxa inválida. Digite uma porcentagem, como 10 ou 10,5.'};const parts=value.replace(',','.').split('.');const decimals=parts[1]||'';const scale=10n**BigInt(decimals.length);return{ok:true,units:BigInt(parts[0])*scale+BigInt(decimals||'0'),scale};}
-    function roundHalfUp(n,d){return(n+d/2n)/d;}
-    function formatCents(cents){const whole=cents/100n;const fraction=(cents%100n).toString().padStart(2,'0');return'R$ '+new Intl.NumberFormat('pt-BR').format(whole)+','+fraction;}
-    function calculateSplit(amountRaw,peopleRaw,taxRaw){const amount=parseMoneyToCents(amountRaw);if(!amount.ok)return amount;const people=parsePeople(peopleRaw);if(!people.ok)return people;const tax=parsePercent(taxRaw);if(!tax.ok)return tax;const multiplier=100n*tax.scale+tax.units;const totalCents=roundHalfUp(amount.cents*multiplier,100n*tax.scale);const divisor=BigInt(people.count);const baseCents=totalCents/divisor;const extraCount=Number(totalCents%divisor);return{ok:true,totalCents,people:people.count,baseCents,extraCount,extraCents:baseCents+1n,regularCount:people.count-extraCount};}
-    const amountInput=document.getElementById('amount'),peopleInput=document.getElementById('people'),taxInput=document.getElementById('tax'),applyTaxButton=document.getElementById('apply-tax'),emptyState=document.getElementById('empty-state'),errorState=document.getElementById('error-state'),calculation=document.getElementById('calculation'),totalValue=document.getElementById('total-value'),shareValue=document.getElementById('share-value'),shareDetail=document.getElementById('share-detail');let hasInteracted=false;
-    function render(){const r=calculateSplit(amountInput.value,peopleInput.value,taxInput.value);emptyState.hidden=true;errorState.hidden=true;calculation.hidden=true;if(!hasInteracted&&!amountInput.value.trim()&&!peopleInput.value.trim()){emptyState.hidden=false;return;}if(!r.ok){errorState.textContent=r.error;errorState.hidden=false;return;}totalValue.textContent=formatCents(r.totalCents);if(r.extraCount===0){shareValue.textContent='Cada pessoa paga '+formatCents(r.baseCents)+'.';shareDetail.textContent='A divisão fecha exatamente: as partes somam o total da conta.';}else if(r.regularCount===0){shareValue.textContent='As '+r.people+' pessoas pagam '+formatCents(r.extraCents)+'.';shareDetail.textContent='A divisão fecha exatamente: as partes somam o total da conta.';}else{shareValue.textContent=(r.regularCount===1?'1 pessoa paga ':r.regularCount+' pessoas pagam ')+formatCents(r.baseCents)+'.';shareDetail.textContent=(r.extraCount===1?'1 pessoa paga 1 centavo a mais: ':r.extraCount+' pessoas pagam 1 centavo a mais: ')+formatCents(r.extraCents)+'. A soma das partes é exatamente igual ao total.';}calculation.hidden=false;}
-    [amountInput,peopleInput,taxInput].forEach(input=>input.addEventListener('input',()=>{hasInteracted=true;render();}));applyTaxButton.addEventListener('click',()=>{taxInput.value='10';hasInteracted=true;render();taxInput.focus();});render();
+  (function () {
+    'use strict';
+
+    // =====================================================================
+    // PARTE 1 — LÓGICA DO CÁLCULO (não mexe na tela)
+    // Todo dinheiro é tratado em CENTAVOS inteiros (BigInt), para nunca
+    // aparecer erro de conta com números quebrados.
+    // =====================================================================
+
+    // Formatos aceitos para o valor da conta:
+    //   1234,56   → vírgula como separador de centavos
+    //   1.234,56  → ponto de milhar + vírgula de centavos
+    //   1234.56   → ponto como separador de centavos (1 ou 2 casas)
+    //   1.234     → sem vírgula e com grupos de 3 depois do ponto = mil duzentos e trinta e quatro
+    const COM_VIRGULA = /^(?:\d+|\d{1,3}(?:\.\d{3})+),\d{1,2}$/;   // 1234,56 ou 1.234,56
+    const SO_MILHAR = /^(?:\d+|\d{1,3}(?:\.\d{3})+)$/;             // 1234 ou 1.234 ou 1.234.567
+    const PONTO_DECIMAL = /^\d+\.\d{1,2}$/;                        // 1234.56 ou 45.9
+
+    // Lê o valor digitado e devolve os centavos, ou uma mensagem de erro.
+    function parseMoneyToCents(raw) {
+      const value = String(raw ?? '').trim();
+      if (!value) return { ok: false, error: 'Informe o valor da conta.' };
+      if (value.startsWith('-')) return { ok: false, error: 'O valor da conta não pode ser negativo.' };
+
+      let whole;
+      let decimal = '';
+      if (COM_VIRGULA.test(value)) {
+        [whole, decimal] = value.split(',');
+        whole = whole.replace(/\./g, '');
+      } else if (PONTO_DECIMAL.test(value)) {
+        [whole, decimal] = value.split('.');
+      } else if (SO_MILHAR.test(value)) {
+        whole = value.replace(/\./g, '');
+      } else {
+        return { ok: false, error: 'Valor inválido. Use números, como 1234,56 ou 1.234,56 ou 1234.56.' };
+      }
+
+      const cents = BigInt(whole) * 100n + BigInt(decimal.padEnd(2, '0'));
+      if (cents === 0n) return { ok: false, error: 'O valor da conta deve ser maior que zero.' };
+      return { ok: true, cents };
+    }
+
+    // Lê o número de pessoas: inteiro de 1 a 99.
+    function parsePeople(raw) {
+      const value = String(raw ?? '').trim();
+      if (!value) return { ok: false, error: 'Informe o número de pessoas.' };
+      if (/[,.]/.test(value)) return { ok: false, error: 'O número de pessoas deve ser um número inteiro, sem decimais.' };
+      if (!/^\d+$/.test(value)) return { ok: false, error: 'O número de pessoas deve ser um número inteiro de 1 a 99.' };
+      const count = Number(value);
+      if (count === 0) return { ok: false, error: 'O número de pessoas não pode ser 0. Informe de 1 a 99.' };
+      if (count > 99) return { ok: false, error: 'O número de pessoas deve ser um número inteiro de 1 a 99.' };
+      return { ok: true, count };
+    }
+
+    // Lê a taxa em %. Vazia vale 0. Aceita até 2 casas decimais (10,5 ou 10.5).
+    // A taxa é guardada como "units / scale" para não perder precisão (10,5% = 105 / 10).
+    function parsePercent(raw) {
+      const value = String(raw ?? '').trim();
+      if (!value) return { ok: true, units: 0n, scale: 1n };
+      if (value.startsWith('-')) return { ok: false, error: 'A taxa de serviço não pode ser negativa.' };
+      if (!/^\d+(?:[,.]\d{1,2})?$/.test(value)) return { ok: false, error: 'Taxa inválida. Digite uma porcentagem, como 10 ou 10,5.' };
+      const [intPart, decimals = ''] = value.replace(',', '.').split('.');
+      const scale = 10n ** BigInt(decimals.length);
+      return { ok: true, units: BigInt(intPart) * scale + BigInt(decimals || '0'), scale };
+    }
+
+    // Divisão inteira arredondando "meio para cima" (0,5 centavo vira 1 centavo).
+    function roundHalfUp(n, d) {
+      return (n + d / 2n) / d;
+    }
+
+    // Centavos → "R$ 1.234,56". O espaço depois de "R$" não deixa quebrar a linha.
+    function formatCents(cents) {
+      const whole = cents / 100n;
+      const fraction = (cents % 100n).toString().padStart(2, '0');
+      return 'R$\u00a0' + new Intl.NumberFormat('pt-BR').format(whole) + ',' + fraction;
+    }
+
+    // O cálculo completo:
+    // 1) total = valor + taxa, arredondado aos centavos;
+    // 2) todos pagam o mesmo valor-base (divisão inteira em centavos);
+    // 3) os centavos que sobram vão, 1 a 1, para algumas pessoas.
+    // Assim a soma das partes é sempre igual ao total.
+    function calculateSplit(amountRaw, peopleRaw, taxRaw) {
+      const amount = parseMoneyToCents(amountRaw);
+      if (!amount.ok) return amount;
+      const people = parsePeople(peopleRaw);
+      if (!people.ok) return people;
+      const tax = parsePercent(taxRaw);
+      if (!tax.ok) return tax;
+
+      const multiplier = 100n * tax.scale + tax.units;
+      const totalCents = roundHalfUp(amount.cents * multiplier, 100n * tax.scale);
+      const divisor = BigInt(people.count);
+      const baseCents = totalCents / divisor;
+      const extraCount = Number(totalCents % divisor);   // quantas pessoas pagam 1 centavo a mais
+
+      return {
+        ok: true,
+        totalCents,
+        people: people.count,
+        baseCents,
+        extraCount,
+        extraCents: baseCents + 1n,
+        regularCount: people.count - extraCount,
+      };
+    }
+
+    // =====================================================================
+    // PARTE 2 — TELA (lê os campos, mostra erros e o resultado)
+    // =====================================================================
+
+    const form = document.getElementById('split-form');
+    const resultPanel = document.getElementById('result-panel');
+    const emptyState = document.getElementById('empty-state');
+    const emptyText = document.getElementById('empty-text');
+    const calculation = document.getElementById('calculation');
+    const totalValue = document.getElementById('total-value');
+    const shareValue = document.getElementById('share-value');
+    const shareDetail = document.getElementById('share-detail');
+    const announcer = document.getElementById('announcer');
+    const applyTaxButton = document.getElementById('apply-tax');
+
+    // Cada campo: o elemento, a mensagem de erro, a nota de ajuda e quem valida.
+    const fields = {
+      amount: { input: document.getElementById('amount'), error: document.getElementById('amount-error'), note: 'amount-note', check: parseMoneyToCents },
+      people: { input: document.getElementById('people'), error: document.getElementById('people-error'), note: 'people-note', check: parsePeople },
+      tax: { input: document.getElementById('tax'), error: document.getElementById('tax-error'), note: 'tax-note', check: parsePercent },
+    };
+    const order = ['amount', 'people', 'tax'];
+
+    // showError: se o erro daquele campo pode aparecer.
+    // Ele só passa a aparecer quando a pessoa SAI do campo (ou toca em "Ver a divisão"),
+    // nunca no meio da digitação. Enquanto digita, o erro só pode SUMIR (quando o valor fica certo).
+    const showError = { amount: false, people: false, tax: false };
+    let announceTimer = null;
+
+    const PEOPLE_WORD = (n) => (n === 1 ? '1 pessoa paga' : n + ' pessoas pagam');
+
+    // Mostra ou esconde o erro embaixo de um campo e avisa o leitor de tela.
+    function showFieldError(name, message) {
+      const f = fields[name];
+      if (message) {
+        f.error.textContent = message;
+        f.error.hidden = false;
+        f.input.setAttribute('aria-invalid', 'true');
+        f.input.setAttribute('aria-describedby', f.note + ' ' + f.error.id);
+      } else {
+        f.error.textContent = '';
+        f.error.hidden = true;
+        f.input.removeAttribute('aria-invalid');
+        f.input.setAttribute('aria-describedby', f.note);
+      }
+    }
+
+    // Monta os textos do resultado, inclusive nos casos extremos.
+    function describe(r) {
+      if (r.extraCount === 0) {
+        const main = r.people === 1 ? '1 pessoa paga ' + formatCents(r.baseCents) + '.' : 'Cada pessoa paga ' + formatCents(r.baseCents) + '.';
+        return { main, detail: 'A divisão fecha exatamente: as partes somam o total da conta.' };
+      }
+      if (r.baseCents === 0n) {
+        // Ex.: R$ 0,01 para 3 pessoas → só sobram centavos.
+        return {
+          main: PEOPLE_WORD(r.extraCount) + ' ' + formatCents(r.extraCents) + '.',
+          detail: 'O total é menor que 1 centavo por pessoa, então ' + (r.regularCount === 1 ? '1 pessoa não paga nada' : r.regularCount + ' pessoas não pagam nada') + '. A soma das partes é exatamente igual ao total.',
+        };
+      }
+      return {
+        main: PEOPLE_WORD(r.regularCount) + ' ' + formatCents(r.baseCents) + '.',
+        detail: (r.extraCount === 1 ? '1 pessoa paga 1 centavo a mais: ' : r.extraCount + ' pessoas pagam 1 centavo a mais: ') + formatCents(r.extraCents) + '. A soma das partes é exatamente igual ao total.',
+      };
+    }
+
+    // Atualiza a tela inteira a partir do que está nos campos.
+    function render() {
+      let anyVisibleError = false;
+      for (const name of order) {
+        const result = fields[name].check(fields[name].input.value);
+        if (result.ok) showError[name] = false;
+        const show = !result.ok && showError[name];
+        showFieldError(name, show ? result.error : '');
+        if (show) anyVisibleError = true;
+      }
+
+      const r = calculateSplit(fields.amount.input.value, fields.people.input.value, fields.tax.input.value);
+      if (!r.ok) {
+        calculation.hidden = true;
+        emptyState.hidden = false;
+        emptyText.textContent = anyVisibleError
+          ? 'Corrija o campo indicado para ver a divisão.'
+          : 'Preencha o valor da conta e o número de pessoas para ver a divisão.';
+        scheduleAnnouncement('');
+        return r;
+      }
+
+      const text = describe(r);
+      totalValue.textContent = formatCents(r.totalCents);
+      shareValue.textContent = text.main;
+      shareDetail.textContent = text.detail;
+      emptyState.hidden = true;
+      calculation.hidden = false;
+      scheduleAnnouncement('Total ' + formatCents(r.totalCents) + '. ' + text.main + ' ' + text.detail);
+      return r;
+    }
+
+    // Leitor de tela: só anuncia o resultado depois de 1 segundo sem digitar.
+    function scheduleAnnouncement(message) {
+      clearTimeout(announceTimer);
+      announceTimer = setTimeout(() => { announcer.textContent = message; }, 1000);
+    }
+
+    // Digitando: recalcula na hora. Erro novo só aparece ao sair do campo.
+    for (const name of order) {
+      const input = fields[name].input;
+      input.addEventListener('input', () => {
+        // Apagou o valor e o número de pessoas: volta ao estado inicial, sem erro.
+        if (!fields.amount.input.value.trim() && !fields.people.input.value.trim()) {
+          showError.amount = false;
+          showError.people = false;
+        }
+        render();
+      });
+      input.addEventListener('blur', () => {
+        if (input.value.trim()) showError[name] = true;
+        render();
+      });
+    }
+
+    // Botão 10%: coloca 10 na taxa.
+    applyTaxButton.addEventListener('click', () => {
+      fields.tax.input.value = '10';
+      render();
+      fields.tax.input.focus();
+    });
+
+    // "Enter" / "Próximo" no teclado: vai para o próximo campo; no último, mostra o resultado.
+    // O botão "Ver a divisão" (celular) faz o mesmo que o último Enter.
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const active = document.activeElement;
+      const index = order.findIndex((name) => fields[name].input === active);
+      if (index >= 0 && index < order.length - 1) {
+        fields[order[index + 1]].input.focus();
+        return;
+      }
+      for (const name of order) showError[name] = true;
+      const r = render();
+      if (!r.ok) {
+        const firstInvalid = order.find((name) => !fields[name].check(fields[name].input.value).ok);
+        fields[firstInvalid].input.focus();
+        return;
+      }
+      if (active && active.blur) active.blur();   // fecha o teclado do celular
+      // Rola até o resultado só se ele não estiver inteiro na tela (no celular, fica embaixo).
+      const box = resultPanel.getBoundingClientRect();
+      if (box.top < 0 || box.bottom > window.innerHeight) {
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        resultPanel.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      }
+      resultPanel.focus({ preventScroll: true });
+    });
+
+    render();
   })();
   </script>
 </body>
